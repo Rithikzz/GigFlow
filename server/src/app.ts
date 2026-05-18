@@ -32,6 +32,11 @@ export function createApp(): express.Application {
 
   app.use(requestLogger);
 
+  // Top-level instant health checks for Render/Cloud deployment validation
+  app.get(['/health', '/api/health', '/api/v1/health'], (_req, res) => {
+    res.status(200).json({ status: 'success', message: 'GigFlow API is healthy and operational' });
+  });
+
   app.use('/api/v1', apiRouter);
 
   app.use(notFoundHandler);
