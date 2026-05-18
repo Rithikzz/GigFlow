@@ -14,18 +14,28 @@ export function createApp(): express.Application {
   const config = loadEnv();
   const app = express();
 
+  const allowedOrigins = [
+    "http://localhost:5173",
+    "https://gig-flow-git-master-rithik-s-projects5.vercel.app",
+    "https://gig-flow-otnkdtn2s-rithik-s-projects5.vercel.app",
+  ];
+
   app.use(
     cors({
-      origin: [
-        "http://localhost:5173",
-        "https://gig-flow-git-master-rithik-s-projects5.vercel.app",
-        "https://gig-flow-otnkdtn2s-rithik-s-projects5.vercel.app",
-      ],
+      origin: function (origin, callback) {
+        if (!origin || allowedOrigins.includes(origin)) {
+          callback(null, true);
+        } else {
+          callback(new Error("CORS not allowed"));
+        }
+      },
       credentials: true,
       methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
       allowedHeaders: ["Content-Type", "Authorization"],
     })
   );
+
+  app.options("*", cors() as any);
 
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
