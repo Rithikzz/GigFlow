@@ -22,7 +22,7 @@ export function createApp(): express.Application {
         "https://gig-flow-otnkdtn2s-rithik-s-projects5.vercel.app",
       ],
       credentials: true,
-      methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+      methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
       allowedHeaders: ["Content-Type", "Authorization"],
     })
   );
