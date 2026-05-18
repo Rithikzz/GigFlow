@@ -3,23 +3,26 @@ import { Response } from 'express';
 interface ResponseData<T = unknown> {
   data?: T;
   message?: string;
-  meta?: {
-    page?: number;
-    limit?: number;
-    total?: number;
+  pagination?: {
+    currentPage: number;
+    totalPages: number;
+    totalRecords: number;
+    hasNextPage: boolean;
+    hasPrevPage: boolean;
+    perPage: number;
   };
 }
 
 export function successResponse<T>(
   res: Response,
   statusCode: number,
-  { data, message, meta }: ResponseData<T> = {}
+  { data, message, pagination }: ResponseData<T> = {}
 ): void {
   res.status(statusCode).json({
     success: true,
     message,
     data,
-    ...(meta && { meta }),
+    ...(pagination && { pagination }),
   });
 }
 

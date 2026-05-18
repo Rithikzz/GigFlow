@@ -3,14 +3,14 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { TrendingUp, Mail, Lock, LogIn, ArrowRight } from 'lucide-react';
+import { TrendingUp, Mail, Lock, LogIn } from 'lucide-react';
 import { authService } from '../../services/authService';
 import { useAuthStore } from '../../store/useAuthStore';
 import toast from 'react-hot-toast';
 
 const loginSchema = z.object({
   email: z.string().email('Please enter a valid email address'),
-  password: z.string().min(6, 'Password must be at least 6 characters'),
+  password: z.string().min(8, 'Password must be at least 8 characters'),
 });
 
 type LoginFormData = z.infer<typeof loginSchema>;
@@ -22,7 +22,6 @@ export const Login: React.FC = () => {
   const {
     register,
     handleSubmit,
-    setValue,
     formState: { errors },
   } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
@@ -41,12 +40,6 @@ export const Login: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleQuickLogin = () => {
-    setValue('email', 'demo@gigflow.com');
-    setValue('password', 'password');
-    toast.success('Credentials filled! Click Sign In.');
   };
 
   return (
@@ -121,16 +114,6 @@ export const Login: React.FC = () => {
             </button>
           </form>
 
-          {/* Quick Sandbox Login Section */}
-          <div className="mt-6 pt-5 border-t border-white/5 flex flex-col gap-3">
-            <button
-              onClick={handleQuickLogin}
-              className="w-full flex items-center justify-between px-4 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/5 text-xs text-brand-400 font-medium group transition-all"
-            >
-              <span>🚀 Sandbox Demo Mode (Auto-fill)</span>
-              <ArrowRight className="w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-0.5" />
-            </button>
-          </div>
         </div>
 
         {/* Footer info */}

@@ -1,2 +1,1 @@
-// Custom React hooks will go here
-export {};
+export { useDebounce } from './useDebounce';

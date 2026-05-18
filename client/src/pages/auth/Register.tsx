@@ -11,7 +11,8 @@ import toast from 'react-hot-toast';
 const registerSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
   email: z.string().email('Please enter a valid email address'),
-  password: z.string().min(6, 'Password must be at least 6 characters'),
+  password: z.string().min(8, 'Password must be at least 8 characters'),
+  role: z.enum(['ADMIN', 'SALES']),
 });
 
 type RegisterFormData = z.infer<typeof registerSchema>;
@@ -26,6 +27,9 @@ export const Register: React.FC = () => {
     formState: { errors },
   } = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
+    defaultValues: {
+      role: 'SALES',
+    },
   });
 
   const onSubmit = async (data: RegisterFormData) => {
@@ -118,6 +122,22 @@ export const Register: React.FC = () => {
               </div>
               {errors.password && (
                 <p className="text-xs text-rose-400 mt-1">{errors.password.message}</p>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-dark-300 uppercase tracking-wider mb-2">
+                Role
+              </label>
+              <select
+                className="w-full pl-4 pr-4 py-3 rounded-xl glass-input text-sm appearance-none"
+                {...register('role')}
+              >
+                <option value="SALES" className="bg-dark-900 text-white">Sales</option>
+                <option value="ADMIN" className="bg-dark-900 text-white">Admin</option>
+              </select>
+              {errors.role && (
+                <p className="text-xs text-rose-400 mt-1">{errors.role.message}</p>
               )}
             </div>
 

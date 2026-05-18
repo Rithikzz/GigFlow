@@ -1,13 +1,13 @@
 import { Router } from 'express';
 import { 
   getAllLeads, 
+  getLeadById,
   createLead, 
   updateLead, 
-  updateLeadStatus, 
-  deleteLead, 
-  addLeadNote 
+  deleteLead
 } from '../controllers/leadController.js';
-import { protect } from '../middleware/authMiddleware.js';
+import { authorizeRoles, protect } from '../middleware/authMiddleware.js';
+import { validateCreateLead, validateLeadQuery, validateUpdateLead } from '../validators/index.js';
 
 const router = Router();
 
@@ -15,17 +15,12 @@ const router = Router();
 router.use(protect);
 
 router.route('/')
-  .get(getAllLeads)
-  .post(createLead);
+  .get(validateLeadQuery, getAllLeads)
+  .post(validateCreateLead, createLead);
 
 router.route('/:id')
-  .put(updateLead)
-  .delete(deleteLead);
-
-router.route('/:id/status')
-  .patch(updateLeadStatus);
-
-router.route('/:id/notes')
-  .post(addLeadNote);
+  .get(getLeadById)
+  .put(validateUpdateLead, updateLead)
+  .delete(authorizeRoles('ADMIN'), deleteLead);
 
 export default router;

@@ -1,51 +1,90 @@
+export type Role = 'ADMIN' | 'SALES';
+
 export interface User {
-  id: string;
+  _id: string;
   name: string;
   email: string;
-  role: 'admin' | 'user';
-  avatar?: string;
-  createdAt: string;
+  role: Role;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
-export type LeadStatus = 'new' | 'contacted' | 'negotiating' | 'won' | 'lost';
+export type LeadStatus = 'NEW' | 'CONTACTED' | 'QUALIFIED' | 'LOST';
+export type LeadSource = 'WEBSITE' | 'INSTAGRAM' | 'REFERRAL';
+export type LeadSort = 'latest' | 'oldest';
 
-export interface LeadNote {
-  id: string;
-  leadId: string;
-  authorName: string;
-  content: string;
-  createdAt: string;
+export interface AssignedUser {
+  _id: string;
+  name: string;
+  email: string;
+  role: Role;
 }
 
 export interface Lead {
-  id: string;
-  title: string;
-  clientName: string;
-  clientEmail: string;
-  clientPhone?: string;
+  _id: string;
+  name: string;
+  email: string;
   status: LeadStatus;
-  value: number;
-  source: string;
-  description?: string;
-  notes?: LeadNote[];
-  assignedTo?: User;
+  source: LeadSource;
+  assignedTo?: AssignedUser | null;
   createdAt: string;
   updatedAt: string;
 }
 
-export interface AuthState {
-  user: User | null;
-  token: string | null;
-  isAuthenticated: boolean;
-  isLoading: boolean;
-  error: string | null;
+export interface CreateLeadPayload {
+  name: string;
+  email: string;
+  status?: LeadStatus;
+  source: LeadSource;
+  assignedTo?: string;
 }
 
-export interface DashboardStats {
-  totalLeads: number;
-  totalValue: number;
-  wonValue: number;
-  conversionRate: number;
-  statusBreakdown: Record<LeadStatus, number>;
-  recentLeads: Lead[];
+export interface UpdateLeadPayload {
+  name?: string;
+  email?: string;
+  status?: LeadStatus;
+  source?: LeadSource;
+  assignedTo?: string | null;
+}
+
+export interface PaginationMeta {
+  currentPage: number;
+  totalPages: number;
+  totalRecords: number;
+  hasNextPage: boolean;
+  hasPrevPage: boolean;
+  perPage: number;
+}
+
+export interface ApiSuccessResponse<T> {
+  success: boolean;
+  message: string;
+  data: T;
+  pagination?: PaginationMeta;
+}
+
+export interface AuthResponse {
+  status: 'success';
+  token: string;
+  user: User;
+}
+
+export interface AuthMeResponse {
+  status: 'success';
+  user: User;
+}
+
+export interface LeadListQuery {
+  page?: number;
+  status?: LeadStatus;
+  source?: LeadSource;
+  sort?: LeadSort;
+  search?: string;
+}
+
+export interface LeadToolbarState {
+  search: string;
+  status?: LeadStatus;
+  source?: LeadSource;
+  sort: LeadSort;
 }

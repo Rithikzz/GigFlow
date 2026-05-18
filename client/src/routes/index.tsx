@@ -5,6 +5,7 @@ import { Login } from '../pages/auth/Login';
 import { Register } from '../pages/auth/Register';
 import { Dashboard } from '../pages/dashboard/Dashboard';
 import { Leads } from '../pages/leads/Leads';
+import { LeadDetails } from '../pages/leads/LeadDetails';
 import { Shell } from '../components/layout/Shell';
 
 // Route Guard for authenticated users
@@ -56,6 +57,14 @@ export const AppRoutes: React.FC = () => {
             <Leads />
           </ProtectedRoute>
         } 
+      />
+      <Route
+        path="/leads/:id"
+        element={
+          <ProtectedRoute>
+            <LeadDetails />
+          </ProtectedRoute>
+        }
       />
 
       {/* Default Redirection Fallbacks */}

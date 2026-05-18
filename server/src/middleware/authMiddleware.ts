@@ -1,8 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { User } from '../models/User.js';
-import { JwtPayload } from '../types/index.js';
-import { HTTP_STATUS } from '../constants/index.js';
+import { JwtPayload, Role } from '../types/index.js';
 import { getConfig } from '../config/env.js';
 import AppError from '../utils/appError.js';
 
@@ -14,7 +13,8 @@ export async function protect(
   const authHeader = req.headers.authorization;
 
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    throw AppError.unauthorized('Not authorized, token missing');
+    next(AppError.unauthorized('Not authorized, token missing'));
+    return;
   }
 
   const token = authHeader.split(' ')[1];
@@ -25,7 +25,8 @@ export async function protect(
 
     const user = await User.findById(decoded.id).select('-password');
     if (!user) {
-      throw AppError.unauthorized('User not found');
+      next(AppError.unauthorized('User not found'));
+      return;
     }
 
     req.user = {
@@ -33,7 +34,6 @@ export async function protect(
       name: user.name,
       email: user.email,
       role: user.role,
-      avatar: user.avatar,
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
     };
@@ -42,21 +42,22 @@ export async function protect(
   } catch (error: unknown) {
     if (error instanceof AppError) {
       next(error);
-      return;
+    } else {
+      next(AppError.unauthorized('Not authorized, token invalid or expired'));
     }
-    throw AppError.unauthorized('Not authorized, token invalid or expired');
   }
 }
 
-export function authorize(...roles: string[]) {
+export function authorizeRoles(...roles: Role[]) {
   return (req: Request, _res: Response, next: NextFunction): void => {
     if (!req.user) {
-      throw AppError.unauthorized();
+      next(AppError.unauthorized());
       return;
     }
 
     if (!roles.includes(req.user.role)) {
-      throw AppError.forbidden('You do not have permission to perform this action');
+      next(AppError.forbidden('You do not have permission to perform this action'));
+      return;
     }
 
     next();

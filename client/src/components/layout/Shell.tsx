@@ -8,7 +8,10 @@ import {
   X, 
   TrendingUp, 
   User as UserIcon,
-  ChevronRight
+  ChevronRight,
+  BriefcaseBusiness,
+  Sun,
+  Moon
 } from 'lucide-react';
 import { useAuthStore } from '../../store/useAuthStore';
 import toast from 'react-hot-toast';
@@ -23,9 +26,28 @@ export const Shell: React.FC<ShellProps> = ({ children }) => {
   const { user, clearAuth } = useAuthStore();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
+  const [theme, setTheme] = useState<'light' | 'dark'>(() => {
+    const saved = localStorage.getItem('gigflow_theme');
+    if (saved === 'light' || saved === 'dark') return saved;
+    return 'dark'; // default to dark
+  });
+
+  React.useEffect(() => {
+    if (theme === 'light') {
+      document.body.classList.add('light');
+    } else {
+      document.body.classList.remove('light');
+    }
+    localStorage.setItem('gigflow_theme', theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme((prev) => (prev === 'light' ? 'dark' : 'light'));
+  };
+
   const navigation = [
     { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
-    { name: 'Leads Pipeline', href: '/leads', icon: Layers },
+    { name: 'Leads', href: '/leads', icon: Layers },
   ];
 
   const handleLogout = () => {
@@ -110,23 +132,19 @@ export const Shell: React.FC<ShellProps> = ({ children }) => {
         {/* User Card Profile & Sign Out */}
         <div className="p-4 border-t border-white/5 bg-dark-950/40">
           <div className="flex items-center gap-3 p-2 rounded-xl bg-white/5 border border-white/5 mb-3">
-            {user?.avatar ? (
-              <img 
-                src={user.avatar} 
-                alt={user.name} 
-                className="w-10 h-10 rounded-lg object-cover ring-2 ring-brand-500/20"
-              />
-            ) : (
-              <div className="w-10 h-10 rounded-lg bg-brand-600/20 flex items-center justify-center border border-brand-500/20">
-                <UserIcon className="w-5 h-5 text-brand-400" />
-              </div>
-            )}
+            <div className="w-10 h-10 rounded-lg bg-brand-600/20 flex items-center justify-center border border-brand-500/20">
+              <UserIcon className="w-5 h-5 text-brand-400" />
+            </div>
             <div className="flex-1 min-w-0">
               <h2 className="text-sm font-semibold text-white truncate m-0 leading-tight">
-                {user?.name || 'Alex Mercer'}
+                {user?.name || 'GigFlow User'}
               </h2>
               <p className="text-xs text-dark-400 truncate mt-0.5">
-                {user?.email || 'demo@gigflow.com'}
+                {user?.email || 'user@gigflow.com'}
+              </p>
+              <p className="text-[11px] mt-1 inline-flex items-center gap-1 text-brand-300">
+                <BriefcaseBusiness className="w-3 h-3" />
+                Role: {user?.role ?? 'SALES'}
               </p>
             </div>
           </div>
@@ -136,14 +154,53 @@ export const Shell: React.FC<ShellProps> = ({ children }) => {
             className="w-full flex items-center justify-center gap-2.5 px-4 py-2.5 rounded-xl border border-rose-500/20 text-rose-400 hover:bg-rose-500/10 hover:text-rose-300 transition-all font-sans text-sm font-semibold"
           >
             <LogOut className="w-4 h-4" />
-            Sign Out
+            Logout
           </button>
         </div>
       </aside>
 
       {/* Main Content Area Container */}
-      <main className="flex-1 flex flex-col min-w-0 overflow-y-auto max-h-screen relative z-10 px-6 py-6 md:px-10 md:py-8">
+      <main className="flex-1 flex flex-col min-w-0 overflow-y-auto max-h-screen relative z-10">
+        <header className="sticky top-0 z-20 border-b border-white/10 bg-dark-950/80 px-6 py-4 backdrop-blur-md md:px-10">
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <p className="text-xs uppercase tracking-wider text-dark-400">Smart Leads Dashboard</p>
+              <h2 className="text-lg font-semibold text-white">GigFlow CRM</h2>
+            </div>
+
+            <div className="flex items-center gap-3">
+              {/* Theme Toggle Control */}
+              <button
+                onClick={toggleTheme}
+                className="p-2.5 rounded-xl border border-white/10 bg-white/5 text-dark-300 hover:text-white hover:bg-white/10 active:scale-95 transition-all shadow-md flex items-center justify-center cursor-pointer"
+                aria-label="Toggle Theme"
+              >
+                {theme === 'light' ? (
+                  <Moon className="w-4 h-4 text-brand-600" />
+                ) : (
+                  <Sun className="w-4 h-4 text-amber-400" />
+                )}
+              </button>
+
+              <div className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 px-3 py-2">
+                <UserIcon className="h-4 w-4 text-brand-300" />
+                <div className="text-right">
+                  <p className="text-xs text-white">{user?.name ?? 'User'}</p>
+                  <p className="text-[11px] text-dark-300">{user?.role ?? 'SALES'}</p>
+                </div>
+                <button
+                  onClick={handleLogout}
+                  className="rounded-lg bg-rose-500/20 px-2 py-1 text-xs font-semibold text-rose-300 hover:bg-rose-500/30"
+                >
+                  Logout
+                </button>
+              </div>
+            </div>
+          </div>
+        </header>
+        <section className="px-6 py-6 md:px-10 md:py-8">
         {children}
+        </section>
       </main>
     </div>
   );

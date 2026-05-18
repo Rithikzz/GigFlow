@@ -1,38 +1,28 @@
 import { Document, Types } from 'mongoose';
 
+export type Role = 'ADMIN' | 'SALES';
+export type LeadStatus = 'NEW' | 'CONTACTED' | 'QUALIFIED' | 'LOST';
+export type LeadSource = 'WEBSITE' | 'INSTAGRAM' | 'REFERRAL';
+
 export interface IUser extends Document {
   _id: Types.ObjectId;
   name: string;
   email: string;
   password: string;
-  role: 'admin' | 'user';
-  avatar: string;
+  role: Role;
   createdAt: Date;
   updatedAt: Date;
   comparePassword(enteredPassword: string): Promise<boolean>;
 }
 
-export type LeadStatus = 'new' | 'contacted' | 'negotiating' | 'won' | 'lost';
-
-export interface INote {
-  _id?: Types.ObjectId;
-  authorName: string;
-  content: string;
-  createdAt?: Date;
-}
-
 export interface ILead extends Document {
   _id: Types.ObjectId;
-  title: string;
-  clientName: string;
-  clientEmail: string;
-  clientPhone?: string;
+  name: string;
+  email: string;
   status: LeadStatus;
-  value: number;
-  source: string;
-  description?: string;
-  notes: INote[];
-  assignedTo?: Types.ObjectId;
+  source: LeadSource;
+  assignedTo?: Types.ObjectId | null;
+  createdBy?: Types.ObjectId | null;
   createdAt: Date;
   updatedAt: Date;
 }

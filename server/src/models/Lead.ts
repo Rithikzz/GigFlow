@@ -1,75 +1,49 @@
 import mongoose from 'mongoose';
-import { ILead, INote } from '../types/index.js';
-
-const noteSchema = new mongoose.Schema<INote>(
-  {
-    authorName: {
-      type: String,
-      required: true,
-    },
-    content: {
-      type: String,
-      required: true,
-      trim: true,
-    },
-  },
-  {
-    timestamps: { createdAt: true, updatedAt: false },
-  }
-);
+import { ILead } from '../types/index.js';
 
 const leadSchema = new mongoose.Schema<ILead>(
   {
-    title: {
+    name: {
       type: String,
-      required: [true, 'Please provide a lead title'],
+      required: [true, 'Please provide lead name'],
       trim: true,
     },
-    clientName: {
+    email: {
       type: String,
-      required: [true, 'Please provide client name'],
-      trim: true,
-    },
-    clientEmail: {
-      type: String,
-      required: [true, 'Please provide client email'],
+      required: [true, 'Please provide lead email'],
       trim: true,
       lowercase: true,
-    },
-    clientPhone: {
-      type: String,
-      trim: true,
+      match: [/^\S+@\S+\.\S+$/, 'Please provide a valid email'],
     },
     status: {
       type: String,
-      enum: ['new', 'contacted', 'negotiating', 'won', 'lost'],
-      default: 'new',
-    },
-    value: {
-      type: Number,
-      required: [true, 'Please provide deal valuation'],
-      min: [0, 'Value must be positive'],
-      default: 0,
+      enum: ['NEW', 'CONTACTED', 'QUALIFIED', 'LOST'],
+      default: 'NEW',
     },
     source: {
       type: String,
-      default: 'Website form',
-      trim: true,
+      enum: ['WEBSITE', 'INSTAGRAM', 'REFERRAL'],
+      required: [true, 'Please provide lead source'],
     },
-    description: {
-      type: String,
-      trim: true,
-    },
-    notes: [noteSchema],
     assignedTo: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
+      default: null,
+    },
+    createdBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      default: null,
     },
   },
   {
     timestamps: true,
   }
 );
+
+leadSchema.index({ status: 1, source: 1, createdAt: -1 });
+leadSchema.index({ email: 1 });
+leadSchema.index({ name: 'text', email: 'text' });
 
 export const Lead = mongoose.model<ILead>('Lead', leadSchema);
 export default Lead;

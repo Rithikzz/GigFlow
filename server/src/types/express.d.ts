@@ -1,4 +1,5 @@
 import { Types } from 'mongoose';
+import { Role } from './index.js';
 
 /**
  * Module augmentation for Express Request.
@@ -13,8 +14,7 @@ declare global {
         _id: Types.ObjectId;
         name: string;
         email: string;
-        role: 'admin' | 'user';
-        avatar: string;
+        role: Role;
         createdAt: Date;
         updatedAt: Date;
       };
