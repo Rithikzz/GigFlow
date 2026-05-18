@@ -14,30 +14,18 @@ export function createApp(): express.Application {
   const config = loadEnv();
   const app = express();
 
-  const allowedOrigins = [
-    config.CLIENT_URL,
-    'http://localhost:5173',
-    'http://localhost:8080',
-    'http://localhost:3000'
-  ].filter(Boolean);
-
-  app.use(cors({
-    origin: (origin, callback) => {
-      if (!origin) {
-        callback(null, true);
-        return;
-      }
-      const isAllowed = allowedOrigins.includes(origin) || origin.endsWith('.vercel.app');
-      if (isAllowed) {
-        callback(null, true);
-      } else {
-        callback(null, true); // Fallback to allow dev connections gracefully
-      }
-    },
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-    credentials: true,
-  }));
+  app.use(
+    cors({
+      origin: [
+        "http://localhost:5173",
+        "https://gig-flow-git-master-rithik-s-projects5.vercel.app",
+        "https://gig-flow-otnkdtn2s-rithik-s-projects5.vercel.app",
+      ],
+      credentials: true,
+      methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+      allowedHeaders: ["Content-Type", "Authorization"],
+    })
+  );
 
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
