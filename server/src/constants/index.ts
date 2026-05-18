@@ -1,4 +1,3 @@
-/** HTTP status code constants for clean architecture */
 export const HTTP_STATUS = {
   OK: 200,
   CREATED: 201,
@@ -10,8 +9,9 @@ export const HTTP_STATUS = {
   INTERNAL_SERVER_ERROR: 500,
 } as const;
 
-/** Application-wide string constants */
 export const APP_CONSTANTS = {
+  API_VERSION: 'v1',
+  API_PREFIX: '/api',
   JWT_EXPIRY: '30d',
   DEFAULT_AVATAR_BG: '6366f1',
   DEFAULT_AVATAR_COLOR: 'fff',

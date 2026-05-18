@@ -3,42 +3,29 @@ import jwt from 'jsonwebtoken';
 import { User } from '../models/User.js';
 import { JwtPayload } from '../types/index.js';
 import { HTTP_STATUS } from '../constants/index.js';
+import { getConfig } from '../config/env.js';
+import AppError from '../utils/appError.js';
 
-/**
- * JWT route protection middleware.
- * Verifies token, loads user record, and attaches it to req.user.
- * Uses the global Express.Request augmentation — no custom request type needed.
- */
-export const protect = async (
+export async function protect(
   req: Request,
-  res: Response,
+  _res: Response,
   next: NextFunction
-): Promise<void> => {
+): Promise<void> {
   const authHeader = req.headers.authorization;
 
-  if (!authHeader || !authHeader.startsWith('Bearer')) {
-    res.status(HTTP_STATUS.UNAUTHORIZED).json({
-      success: false,
-      message: 'Not authorized, token missing',
-    });
-    return;
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    throw AppError.unauthorized('Not authorized, token missing');
   }
 
   const token = authHeader.split(' ')[1];
+  const config = getConfig();
 
   try {
-    const decoded = jwt.verify(
-      token,
-      process.env.JWT_SECRET || 'fallback_secret_key'
-    ) as JwtPayload;
+    const decoded = jwt.verify(token, config.JWT_SECRET) as JwtPayload;
 
     const user = await User.findById(decoded.id).select('-password');
     if (!user) {
-      res.status(HTTP_STATUS.UNAUTHORIZED).json({
-        success: false,
-        message: 'User not found',
-      });
-      return;
+      throw AppError.unauthorized('User not found');
     }
 
     req.user = {
@@ -52,12 +39,28 @@ export const protect = async (
     };
 
     next();
-  } catch {
-    res.status(HTTP_STATUS.UNAUTHORIZED).json({
-      success: false,
-      message: 'Not authorized, token invalid or expired',
-    });
+  } catch (error: unknown) {
+    if (error instanceof AppError) {
+      next(error);
+      return;
+    }
+    throw AppError.unauthorized('Not authorized, token invalid or expired');
   }
-};
+}
+
+export function authorize(...roles: string[]) {
+  return (req: Request, _res: Response, next: NextFunction): void => {
+    if (!req.user) {
+      throw AppError.unauthorized();
+      return;
+    }
+
+    if (!roles.includes(req.user.role)) {
+      throw AppError.forbidden('You do not have permission to perform this action');
+    }
+
+    next();
+  };
+}
 
 export default protect;

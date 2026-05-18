@@ -1,6 +1,5 @@
 import { Document, Types } from 'mongoose';
 
-/** User document interface for Mongoose */
 export interface IUser extends Document {
   _id: Types.ObjectId;
   name: string;
@@ -13,10 +12,8 @@ export interface IUser extends Document {
   comparePassword(enteredPassword: string): Promise<boolean>;
 }
 
-/** Lead status union type */
 export type LeadStatus = 'new' | 'contacted' | 'negotiating' | 'won' | 'lost';
 
-/** Embedded note subdocument interface */
 export interface INote {
   _id?: Types.ObjectId;
   authorName: string;
@@ -24,7 +21,6 @@ export interface INote {
   createdAt?: Date;
 }
 
-/** Lead document interface for Mongoose */
 export interface ILead extends Document {
   _id: Types.ObjectId;
   title: string;
@@ -41,7 +37,6 @@ export interface ILead extends Document {
   updatedAt: Date;
 }
 
-/** JWT token payload structure */
 export interface JwtPayload {
   id: string;
   iat?: number;
